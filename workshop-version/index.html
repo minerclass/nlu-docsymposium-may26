@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Workshop Version · NLU Doctoral Colloquium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200..900;1,9..144,200..900&family=DM+Sans:opsz,wght@9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0b;
+  --bg-elevated: #141416;
+  --bg-glow: #1a1a1c;
+  --ink: #ece8dd;
+  --ink-soft: #a8a59c;
+  --ink-faint: #6e6c66;
+  --ink-ghost: #3a3934;
+  --accent: #f5d000;
+  --accent-deep: #c4a600;
+  --accent-soft: rgba(245, 208, 0, 0.12);
+  --accent-glow: rgba(245, 208, 0, 0.2);
+  --rule: rgba(236, 232, 221, 0.08);
+  --rule-strong: rgba(236, 232, 221, 0.22);
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 350;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────── presentation stage ─────── */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s var(--ease);
+  overflow: hidden;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.slide.exiting {
+  opacity: 0;
+  z-index: 1;
+}
+
+.slide-inner {
+  width: 100%;
+  max-width: 1240px;
+  position: relative;
+}
+
+/* ─────── atmospheric backgrounds ─────── */
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.atmosphere .glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0;
+  transition: opacity 1.2s var(--ease);
+}
+
+.slide.active .atmosphere .glow {
+  opacity: 0.4;
+}
+
+/* ─────── chrome ─────── */
+
+.chrome {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.chrome.top-left { top: 1.5rem; left: 2rem; }
+.chrome.top-right { top: 1.5rem; right: 2rem; text-align: right; }
+.chrome.bottom-left { bottom: 1.5rem; left: 2rem; }
+.chrome.bottom-right { bottom: 1.5rem; right: 2rem; display: flex; gap: 1.25rem; align-items: center; }
+
+.chrome strong { color: var(--ink-soft); font-weight: 400; }
+
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 101;
+  transition: width 0.4s var(--ease);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.nav-hint {
+  pointer-events: auto;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.nav-hint kbd {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--ink-ghost);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--ink-soft);
+  background: var(--bg-elevated);
+}
+
+.timer {
+  pointer-events: auto;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.timer.over { color: var(--accent); }
+
+/* ─────── typography ─────── */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.eyebrow .num {
+  color: var(--accent);
+}
+
+.eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+  max-width: 200px;
+}
+
+h1.title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  margin-bottom: 1.5rem;
+}
+
+h1.title em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 250;
+}
+
+h2.section-title {
+  font-family: var(--serif);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 350;
+  font-variation-settings: "opsz" 144;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.5rem;
+}
+
+h2.section-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+h3.slide-title {
+  font-family: var(--serif);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 350;
+  font-variation-settings: "opsz" 96;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+
+.lede {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--ink);
+  max-width: 880px;
+  margin-bottom: 2rem;
+}
+
+.body-text {
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--ink);
+  max-width: 740px;
+}
+
+.body-text p + p { margin-top: 1rem; }
+.body-text strong { color: var(--ink); font-weight: 500; }
+.body-text em { color: var(--accent); font-style: italic; }
+
+.subtitle {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ink-soft);
+  max-width: 700px;
+  line-height: 1.4;
+  margin-bottom: 2.5rem;
+}
+
+.byline {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.byline strong { color: var(--ink); font-weight: 500; }
+
+/* ─────── opening slide ─────── */
+
+.opening {
+  position: relative;
+}
+
+.opening .label-strip {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 4rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.opening .label-strip .accent { color: var(--accent); }
+
+.opening h1.title {
+  margin-bottom: 2.5rem;
+}
+
+.opening .subtitle {
+  margin-bottom: 4rem;
+}
+
+/* ─────── section divider slide ─────── */
+
+.section-divider {
+  text-align: left;
+}
+
+.section-divider .marker {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(6rem, 18vw, 14rem);
+  font-weight: 200;
+  line-height: 0.85;
+  color: var(--accent);
+  opacity: 0.3;
+  position: absolute;
+  bottom: -2rem;
+  right: -1rem;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.section-divider .content { position: relative; z-index: 1; }
+
+/* ─────── lede slide (large quote-like statement) ─────── */
+
+.lede-slide {
+  text-align: left;
+  max-width: 1100px;
+}
+
+.lede-slide .lede-large {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 300;
+  font-variation-settings: "opsz" 144;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.lede-slide .lede-large em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.lede-slide .attribution {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  max-width: 400px;
+}
+
+/* ─────── two-column layout ─────── */
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.two-col.balanced { grid-template-columns: 1fr 1fr; }
+.two-col.weighted { grid-template-columns: 5fr 7fr; }
+
+/* ─────── grounding case (opening cold open) ─────── */
+
+.grounding-case .case-prompt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+
+.grounding-case .case-title {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+}
+
+.grounding-case .passage {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink-ghost);
+  padding: 1.5rem 1.75rem;
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+  position: relative;
+}
+
+.grounding-case .passage::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -0.6rem;
+  left: 1.5rem;
+  background: var(--bg);
+  padding: 0 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.grounding-case .question-overlay {
+  margin-top: 3rem;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  text-align: center;
+}
+
+.grounding-case .question-overlay .label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.grounding-case .question-overlay .q {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 350;
+  color: var(--ink);
+}
+
+/* ─────── timeline (Ong's stages) ─────── */
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  margin-top: 2.5rem;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.timeline .stage-cell {
+  background: var(--bg);
+  padding: 1.5rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.3s var(--ease);
+  position: relative;
+}
+
+.timeline .stage-cell:hover,
+.timeline .stage-cell.active {
+  background: var(--bg-elevated);
+}
+
+.timeline .stage-cell.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+}
+
+.timeline .stage-num {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.5rem;
+}
+
+.timeline .stage-name {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+
+.timeline .stage-name em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.timeline .stage-period {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+}
+
+.timeline-detail {
+  margin-top: 2rem;
+  min-height: 140px;
+  padding: 1.5rem 0;
+}
+
+.timeline-detail .detail-name {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-style: italic;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.timeline-detail .detail-body {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+  max-width: 780px;
+}
+
+/* ─────── assumptions reveal ─────── */
+
+.assumptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.assumption-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  padding: 1.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.4s var(--ease);
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+}
+
+.assumption-card:hover {
+  border-color: var(--rule-strong);
+}
+
+.assumption-card.revealed {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, rgba(245, 208, 0, 0.04) 100%);
+}
+
+.assumption-card .num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.assumption-card .label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.6rem;
+}
+
+.assumption-card .text {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+
+.assumption-card .break {
+  opacity: 0;
+  max-height: 0;
+  transition: all 0.5s var(--ease);
+  padding-top: 0;
+  border-top: 0 solid var(--accent);
+}
+
+.assumption-card.revealed .break {
+  opacity: 1;
+  max-height: 200px;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--accent);
+}
+
+.assumption-card .break-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.assumption-card .break-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.assumption-card .click-hint {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  opacity: 0.6;
+}
+
+.assumption-card.revealed .click-hint { display: none; }
+
+/* ─────── three characteristics ─────── */
+
+.characteristics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.characteristic {
+  border-left: 2px solid var(--accent);
+  padding: 0.25rem 0 0.25rem 1.5rem;
+}
+
+.characteristic .locus {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.5rem;
+}
+
+.characteristic .name {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+  line-height: 1.1;
+  margin-bottom: 0.85rem;
+}
+
+.characteristic .desc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* ─────── Kapur quadrants ─────── */
+
+.quadrants {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  grid-template-rows: auto 1fr 1fr;
+  gap: 0;
+  max-width: 900px;
+  margin: 2rem 0;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+
+.quadrants .corner { background: transparent; }
+
+.quadrants .col-head, .quadrants .row-head {
+  padding: 0.75rem 1rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-size: 0.65rem;
+}
+
+.quadrants .col-head { text-align: center; border-bottom: 1px solid var(--rule); }
+.quadrants .row-head { display: flex; align-items: center; writing-mode: vertical-rl; transform: rotate(180deg); justify-content: center; border-right: 1px solid var(--rule); }
+
+.quadrant {
+  padding: 1.5rem;
+  border: 1px solid var(--rule);
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s var(--ease);
+}
+
+.quadrant.highlight {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.quadrant .q-name {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+  font-style: italic;
+}
+
+.quadrant.highlight .q-name { color: var(--accent); font-weight: 500; }
+
+.quadrant .q-desc {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ─────── four dimensions explorer ─────── */
+
+.dimensions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.dim-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.35s var(--ease);
+  position: relative;
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.dim-card:hover { border-color: var(--rule-strong); }
+
+.dim-card.active {
+  background: linear-gradient(135deg, var(--bg-elevated) 0%, rgba(245, 208, 0, 0.06) 100%);
+  border-color: var(--accent);
+}
+
+.dim-card .roman {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.dim-card .dim-name {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+
+.dim-card .dim-locus {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.85rem;
+}
+
+.dim-card .dim-summary {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-bottom: 0.85rem;
+}
+
+.dim-card .doctoral {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.45s var(--ease);
+}
+
+.dim-card.active .doctoral {
+  opacity: 1;
+  max-height: 200px;
+  margin-top: 0.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--accent);
+}
+
+.dim-card .doctoral-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.dim-card .doctoral-text {
+  font-size: 0.88rem;
+  color: var(--ink);
+  line-height: 1.55;
+  font-style: italic;
+  font-family: var(--serif);
+}
+
+/* ─────── productive vs exclusionary table ─────── */
+
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.compare-col h4 {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.compare-col.productive h4 { color: var(--accent); border-bottom-color: var(--accent); }
+.compare-col.exclusionary h4 { color: var(--ink-soft); }
+
+.compare-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.compare-col li {
+  padding: 0.55rem 0 0.55rem 1.5rem;
+  position: relative;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.compare-col.productive li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.compare-col.exclusionary li::before {
+  content: "×";
+  position: absolute;
+  left: 0;
+  color: var(--ink-faint);
+}
+
+/* ─────── audit applier (scenario picker) ─────── */
+
+.scenario-picker {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+  min-height: 460px;
+}
+
+.scenario-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.scenario-btn {
+  text-align: left;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  transition: all 0.3s var(--ease);
+  border-left: 3px solid transparent;
+}
+
+.scenario-btn:hover {
+  border-color: var(--rule-strong);
+  border-left-color: var(--ink-soft);
+}
+
+.scenario-btn.active {
+  background: var(--bg-elevated);
+  border-color: var(--rule-strong);
+  border-left-color: var(--accent);
+}
+
+.scenario-btn .s-num {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.scenario-btn.active .s-num { color: var(--accent); }
+
+.scenario-display {
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  padding: 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.scenario-display .s-title {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+
+.scenario-display .s-vignette {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent);
+}
+
+.scenario-display .s-section {
+  margin-bottom: 1.1rem;
+}
+
+.scenario-display .s-section:last-child { margin-bottom: 0; }
+
+.scenario-display .s-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.45rem;
+}
+
+.scenario-display .s-content {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.scenario-display .s-content.productive { color: var(--ink); }
+.scenario-display .s-content.exclusionary { color: var(--ink-soft); }
+
+/* ─────── discussion prompts ─────── */
+
+.prompts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.prompt {
+  border: 1px solid var(--rule);
+  padding: 1.75rem 1.5rem;
+  background: var(--bg-elevated);
+  position: relative;
+  min-height: 220px;
+}
+
+.prompt .p-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.85rem;
+}
+
+.prompt .p-text {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* ─────── speaker notes ─────── */
+
+.notes {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(20, 20, 22, 0.96);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--rule-strong);
+  padding: 1.25rem 2rem 1rem;
+  z-index: 90;
+  transform: translateY(100%);
+  transition: transform 0.4s var(--ease);
+  max-height: 35vh;
+  overflow-y: auto;
+}
+
+.notes.visible { transform: translateY(0); }
+
+.notes .notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.65rem;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.notes .notes-header .label { color: var(--accent); }
+
+.notes .notes-body {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink);
+  max-width: 1100px;
+}
+
+.notes .notes-body p + p { margin-top: 0.5rem; }
+.notes .notes-body strong { color: var(--accent); font-weight: 500; }
+
+/* ─────── help overlay ─────── */
+
+.help {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 11, 0.92);
+  backdrop-filter: blur(20px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+
+.help.visible { opacity: 1; pointer-events: auto; }
+
+.help-content {
+  max-width: 520px;
+  padding: 3rem;
+}
+
+.help-content h3 {
+  font-family: var(--serif);
+  font-size: 1.75rem;
+  font-weight: 350;
+  margin-bottom: 2rem;
+  color: var(--ink);
+}
+
+.help-content .key-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem 2rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  align-items: center;
+}
+
+.help-content kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--ink-ghost);
+  padding: 0.3rem 0.65rem;
+  border-radius: 3px;
+  color: var(--accent);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.help-content .desc { color: var(--ink-soft); letter-spacing: 0.05em; }
+
+/* ─────── deck switch ─────── */
+
+.deck-switch {
+  position: fixed;
+  left: 50%;
+  top: 1.25rem;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  padding: 0.62rem 0.95rem;
+  background: rgba(10, 10, 11, 0.78);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.deck-switch:hover,
+.deck-switch:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
+/* ─────── responsive ─────── */
+
+@media (max-width: 900px) {
+  .slide { padding: 2rem 1.5rem; }
+  .chrome.top-left, .chrome.top-right, .chrome.bottom-left { display: none; }
+  .two-col, .assumptions, .characteristics, .dimensions-grid, .prompts, .compare, .scenario-picker {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .scenario-picker { min-height: auto; }
+  .quadrants { grid-template-columns: 1fr; }
+  .quadrants .row-head { writing-mode: horizontal-tb; transform: none; border-right: none; border-bottom: 1px solid var(--rule); }
+  .timeline { grid-template-columns: 1fr 1fr; }
+  .deck-switch { top: 0.6rem; font-size: 0.6rem; padding: 0.5rem 0.7rem; }
+}
+</style>
+</head>
+<body>
+
+<a class="deck-switch" href="../" aria-label="Open the primary linear presentation deck">Primary deck</a>
+
+<div class="progress-bar" id="progress"></div>
+
+<div class="chrome top-left" id="chrome-section">Section · Opening</div>
+<div class="chrome top-right">
+  <strong id="slide-counter">01 / 19</strong>
+</div>
+<div class="chrome bottom-left">Interactive Workshop Version · NLU Doctoral Colloquium · Miner</div>
+<div class="chrome bottom-right">
+  <span class="timer" id="timer">00:00</span>
+  <span class="nav-hint"><kbd>?</kbd> help</span>
+</div>
+
+<div class="stage" id="stage">
+
+  <!-- ─────── 01 · TITLE ─────── -->
+  <section class="slide active" data-section="Opening" data-time="0" data-notes="Open by letting the title sit for a moment in silence. The audience needs five seconds of nothing before you begin. Welcome them, name what we're doing (a 70-minute session on AI and doctoral work), and acknowledge the framing tension: I'm here to share my research, but I also want you to leave with something usable for your own scholarship.">
+    <div class="atmosphere">
+      <div class="glow" style="background: var(--accent); width: 600px; height: 600px; top: -200px; left: -100px;"></div>
+      <div class="glow" style="background: #2a2a3a; width: 800px; height: 800px; bottom: -300px; right: -200px;"></div>
+    </div>
+    <div class="slide-inner opening">
+      <div class="label-strip">
+        <span>NLU Doctoral Symposium <span class="accent">·</span> Colloquium 2026</span>
+        <span>Qualifying Paper <span class="accent">·</span> Conceptual Analysis</span>
+      </div>
+      <h1 class="title">Beyond <em>Secondary</em><br>Orality</h1>
+      <div class="subtitle">Tertiary algorithmicity and the case for pedagogical friction in doctoral scholarship.</div>
+      <div class="byline">
+        <strong>Micah J. Miner, CETL, Ed.S.</strong>
+        <span>Director of Innovation &amp; Technology · Doctoral Student</span>
+        <span>Curriculum, Advocacy &amp; Policy · National Louis University</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 02 · GROUNDING CASE ─────── -->
+  <section class="slide" data-section="Opening" data-time="3" data-notes="This is the cold open. Hand out two short passages on paper before the session begins, or display them here. Give the audience two minutes to read silently. Then ask: 'What's different?' Give it four full minutes of discussion. Resist the urge to fill silence. The audience will surface the productive/unproductive success distinction in their own terms. Only after they have done the work do you name it. This is pedagogical friction enacted in the session about pedagogical friction.">
+    <div class="slide-inner grounding-case">
+      <div class="eyebrow"><span class="num">01</span> Two passages from a literature review</div>
+      <h3 class="slide-title">Both are competent. Something is different.</h3>
+      <div class="two-col" style="margin-top: 2rem;">
+        <div class="passage" data-label="Passage A">
+          Selwyn (2024) and Jandrić (2023) converge on the postdigital condition as a frame for understanding AI in education, though they diverge on the question of agency. Where Selwyn locates resistance in institutional skepticism, Jandrić finds it in the recursive entanglement of human and machine practice. This study extends both by asking what remains pedagogically protected when the symbolic environment itself becomes algorithmically generative.
+        </div>
+        <div class="passage" data-label="Passage B">
+          The literature on AI in education converges around several key themes including postdigital approaches, critical perspectives on technology, and questions of human agency. Researchers such as Selwyn and Jandrić have made significant contributions to this growing field, offering valuable insights into how educators can navigate the complex landscape of emerging technologies in learning environments.
+        </div>
+      </div>
+      <div class="question-overlay">
+        <div class="label">After two minutes of silent reading</div>
+        <div class="q">What is different between these passages, and which one tells you the student understands the literature?</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 03 · THE QUESTION ─────── -->
+  <section class="slide" data-section="Opening" data-time="10" data-notes="After discussion, transition to this slide. Name what they noticed: Passage A makes specific claims that could be wrong. Passage B is fluent but generic. Then ask the question on the slide. This is the question the whole session opens.">
+    <div class="atmosphere">
+      <div class="glow" style="background: var(--accent); width: 700px; height: 700px; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+    </div>
+    <div class="slide-inner lede-slide">
+      <div class="eyebrow"><span class="num">02</span> The question this session asks</div>
+      <div class="lede-large">
+        What changes when the symbolic environment in which doctoral scholars <em>think, read, write, and argue</em> is increasingly organized by algorithmic systems, both in how content circulates and how content originates?
+      </div>
+      <div class="attribution">A 70-minute session in three parts</div>
+    </div>
+  </section>
+
+  <!-- ─────── 04 · ROADMAP ─────── -->
+  <section class="slide" data-section="Opening" data-time="12" data-notes="Brief roadmap. Three parts, 70 minutes. Part one is the framework. Part two is the educational stakes. Part three is application to your own scholarship. The audit handout is what you take home regardless of which way the discussion goes.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">03</span> Roadmap · the next seventy minutes</div>
+      <h2 class="section-title">Three parts. One question. <em>Your work in the room.</em></h2>
+      <div class="two-col weighted" style="margin-top: 2.5rem;">
+        <div></div>
+        <div>
+          <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 1.25rem 2rem; font-family: var(--mono); font-size: 0.85rem;">
+            <span style="color: var(--accent);">i</span>
+            <span style="color: var(--ink); font-family: var(--serif); font-style: italic; font-size: 1.15rem; line-height: 1.3;">The shift Ong's framework did not anticipate</span>
+            <span style="color: var(--ink-faint); letter-spacing: 0.15em;">~20 min</span>
+
+            <span style="color: var(--accent);">ii</span>
+            <span style="color: var(--ink); font-family: var(--serif); font-style: italic; font-size: 1.15rem; line-height: 1.3;">Why the educational stakes are developmental</span>
+            <span style="color: var(--ink-faint); letter-spacing: 0.15em;">~15 min</span>
+
+            <span style="color: var(--accent);">iii</span>
+            <span style="color: var(--ink); font-family: var(--serif); font-style: italic; font-size: 1.15rem; line-height: 1.3;">Pedagogical friction applied to your scholarship</span>
+            <span style="color: var(--ink-faint); letter-spacing: 0.15em;">~30 min</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 05 · SECTION I DIVIDER ─────── -->
+  <section class="slide section-divider" data-section="Section I · The Shift" data-time="15" data-notes="Section transition. Slow down here. The next four slides do the theoretical work and they need to land. If they don't land, nothing else will.">
+    <div class="atmosphere">
+      <div class="glow" style="background: var(--accent); width: 500px; height: 500px; top: 30%; right: 10%;"></div>
+    </div>
+    <div class="slide-inner content">
+      <div class="marker">i</div>
+      <div class="eyebrow"><span class="num">04</span> Section i · Theoretical foundation</div>
+      <h1 class="title">The shift Ong's<br>framework <em>did not</em><br>anticipate.</h1>
+    </div>
+  </section>
+
+  <!-- ─────── 06 · ONG'S TIMELINE (interactive) ─────── -->
+  <section class="slide" data-section="Section I · The Shift" data-time="17" data-notes="Click each stage to reveal more. For audience members who don't know Ong, this is where they catch up. Don't rush. Each stage is a cognitive event, not just a technological one. The point of this slide is that we've been here before: every shift restructured what it meant to know things.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">05</span> Ong · media restructure consciousness</div>
+      <h3 class="slide-title">Three stages, then two more.</h3>
+      <p class="body-text" style="margin-bottom: 1.5rem;">Each transition is a cognitive event, not just a technological one. Each stage brings capacities the prior lacked and erodes capacities the prior sustained.</p>
+      <div class="timeline" id="ong-timeline">
+        <div class="stage-cell active" data-stage="0">
+          <div class="stage-num">i</div>
+          <div class="stage-name">Primary <em>Orality</em></div>
+          <div class="stage-period">~ pre-3500 BCE</div>
+        </div>
+        <div class="stage-cell" data-stage="1">
+          <div class="stage-num">ii</div>
+          <div class="stage-name">Literacy</div>
+          <div class="stage-period">~ 3500 BCE → 1900s</div>
+        </div>
+        <div class="stage-cell" data-stage="2">
+          <div class="stage-num">iii</div>
+          <div class="stage-name">Secondary <em>Orality</em></div>
+          <div class="stage-period">~ 1920s → 2000s</div>
+        </div>
+        <div class="stage-cell" data-stage="3">
+          <div class="stage-num">iv</div>
+          <div class="stage-name">Algorithmic Secondary</div>
+          <div class="stage-period">~ 2006 → 2022</div>
+        </div>
+        <div class="stage-cell" data-stage="4">
+          <div class="stage-num">v</div>
+          <div class="stage-name">Tertiary <em>Algorithmicity</em></div>
+          <div class="stage-period">~ 2022 →</div>
+        </div>
+      </div>
+      <div class="timeline-detail" id="timeline-detail">
+        <div class="detail-name">Primary orality</div>
+        <div class="detail-body">Memory-based, communal, situational. Knowledge preserved through repetition, formula, and rhythm. The word lives only in the existential present. There is no text to consult, no record to revise. To know something is to be able to say it now, in the company of others.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 07 · THREE ASSUMPTIONS (interactive reveal) ─────── -->
+  <section class="slide" data-section="Section I · The Shift" data-time="22" data-notes="This is the analytical hinge of the whole framework. Click each card with the audience watching. Each click reveals what AI specifically breaks. Take your time. If you have only one minute left in this section, spend it here.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">06</span> The analytical hinge</div>
+      <h3 class="slide-title">Three assumptions in Ong's framework that no longer hold.</h3>
+      <p class="body-text" style="margin-bottom: 0.5rem;">Click each assumption to see what generative AI breaks.</p>
+      <div class="assumptions">
+        <div class="assumption-card" data-assumption="0">
+          <div class="num">01</div>
+          <div class="label">The first assumption</div>
+          <div class="text">Humans originate symbolic content.</div>
+          <div class="break">
+            <div class="break-label">What AI breaks</div>
+            <div class="break-text">Generative systems now produce text, image, and argument indistinguishable from human work. The source of symbolic expression is no longer necessarily human consciousness.</div>
+          </div>
+          <div class="click-hint">click to reveal</div>
+        </div>
+        <div class="assumption-card" data-assumption="1">
+          <div class="num">02</div>
+          <div class="label">The second assumption</div>
+          <div class="text">Distribution follows transparent logics.</div>
+          <div class="break">
+            <div class="break-label">What AI breaks</div>
+            <div class="break-text">Editorial judgment and schedules were visible. Algorithmic curation makes distribution proprietary, opaque, and personalized. Two scholars open the same feed and encounter different literatures.</div>
+          </div>
+          <div class="click-hint">click to reveal</div>
+        </div>
+        <div class="assumption-card" data-assumption="2">
+          <div class="num">03</div>
+          <div class="label">The third assumption</div>
+          <div class="text">Consciousness encounters media as external environment.</div>
+          <div class="break">
+            <div class="break-label">What AI breaks</div>
+            <div class="break-text">Books sit on shelves. Broadcasts emanate from elsewhere. Personalized environments now reflect the user's own patterns back to them, collapsing the distance between mind and medium.</div>
+          </div>
+          <div class="click-hint">click to reveal</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 08 · TERTIARY ALGORITHMICITY DEFINITION ─────── -->
+  <section class="slide" data-section="Section I · The Shift" data-time="27" data-notes="Land the definition. Read it aloud, slowly. Then say: the axis has shifted. It's no longer speech vs. writing. It's whether a human or an algorithm produced the content. That's the rupture.">
+    <div class="atmosphere">
+      <div class="glow" style="background: var(--accent); width: 500px; height: 500px; bottom: 20%; left: 20%;"></div>
+    </div>
+    <div class="slide-inner lede-slide">
+      <div class="eyebrow"><span class="num">07</span> Definition</div>
+      <h3 class="slide-title" style="margin-bottom: 2.5rem;">Tertiary <em style="color:var(--accent);font-style:italic;">Algorithmicity</em></h3>
+      <div class="lede-large">
+        A media environment in which algorithmic systems both <em>curate</em> and <em>generate</em> symbolic content, making human authorship optional at scale.
+      </div>
+      <div class="attribution">The new axis: human vs. algorithmic origination</div>
+    </div>
+  </section>
+
+  <!-- ─────── 09 · THREE CHARACTERISTICS ─────── -->
+  <section class="slide" data-section="Section I · The Shift" data-time="30" data-notes="Three characteristics, one per ruptured assumption. Each one will have a concrete consequence for doctoral work, which we'll get to in the next section.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">08</span> Three defining characteristics</div>
+      <h3 class="slide-title">Each maps to one of the ruptured assumptions.</h3>
+      <div class="characteristics" style="margin-top: 2.5rem;">
+        <div class="characteristic">
+          <div class="locus">i · cognition</div>
+          <div class="name">Noetic<br>displacement</div>
+          <div class="desc">Generative and interpretive operations that previously had to occur within the learner's own thinking are offloaded to an external system.</div>
+        </div>
+        <div class="characteristic">
+          <div class="locus">ii · environment</div>
+          <div class="name">Rhetorical<br>saturation</div>
+          <div class="desc">Origin uncertainty, simulated expression, and simulated dialogue converge. The communicative environment offers responsiveness without genuine contestation.</div>
+        </div>
+        <div class="characteristic">
+          <div class="locus">iii · person</div>
+          <div class="name">Existential<br>abstraction</div>
+          <div class="desc">Symbolic production is severed from lived experience and material consequence. Text expresses positions without having stakes.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 10 · SECTION II DIVIDER ─────── -->
+  <section class="slide section-divider" data-section="Section II · The Stakes" data-time="33" data-notes="Pivot. The threat is not academic integrity. Say this slowly. The audience will expect you to say something about cheating. Let them sit with the fact that you're not going to.">
+    <div class="atmosphere">
+      <div class="glow" style="background: #2a2a3a; width: 600px; height: 600px; top: 50%; left: 30%; transform: translate(-50%, -50%);"></div>
+    </div>
+    <div class="slide-inner content">
+      <div class="marker">ii</div>
+      <div class="eyebrow"><span class="num">09</span> Section ii · Educational stakes</div>
+      <h1 class="title">The threat is <em>not</em><br>academic integrity.</h1>
+      <div class="subtitle" style="margin-top: 2rem;">It is unproductive success.</div>
+    </div>
+  </section>
+
+  <!-- ─────── 11 · KAPUR QUADRANTS ─────── -->
+  <section class="slide" data-section="Section II · The Stakes" data-time="35" data-notes="Walk the audience through the four quadrants. Productive success and productive failure are familiar. Unproductive failure is the standard concern. Unproductive success is what's newly dangerous: the artifact is present, the cognitive development that produced it is not.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">10</span> Kapur · four learning outcomes</div>
+      <h3 class="slide-title">Generative AI lands in one quadrant by default.</h3>
+      <div class="quadrants">
+        <div class="corner"></div>
+        <div class="col-head">Correct performance</div>
+        <div class="col-head">Incorrect performance</div>
+
+        <div class="row-head">With understanding</div>
+        <div class="quadrant">
+          <div class="q-name">Productive success</div>
+          <div class="q-desc">Performance and learning aligned.</div>
+        </div>
+        <div class="quadrant">
+          <div class="q-name">Productive failure</div>
+          <div class="q-desc">Struggle that builds future schema.</div>
+        </div>
+
+        <div class="row-head">Without understanding</div>
+        <div class="quadrant highlight">
+          <div class="q-name">Unproductive success</div>
+          <div class="q-desc">Output looks like learning. The development never occurred.</div>
+        </div>
+        <div class="quadrant">
+          <div class="q-name">Unproductive failure</div>
+          <div class="q-desc">Task exceeds capacity. No learning occurs.</div>
+        </div>
+      </div>
+      <p class="body-text" style="font-size: 0.95rem; margin-top: 1rem; color: var(--ink-soft);">The artifact is present. The cognitive development that produced it is not. The product <em>looks like</em> the product of understanding.</p>
+    </div>
+  </section>
+
+  <!-- ─────── 12 · WHY THIS MATTERS FOR YOU ─────── -->
+  <section class="slide" data-section="Section II · The Stakes" data-time="40" data-notes="This is the moment the session pivots from research presentation to applied workshop. Make eye contact. You are in this room. I am in this room. We are all doing doctoral work right now and AI is in our process. The framework is not about K-12 students. It applies to us.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">11</span> Recursive application</div>
+      <h2 class="section-title">This is not about <em>K-12 students.</em><br>It is about your dissertation.</h2>
+      <p class="body-text" style="margin-top: 2rem; font-size: 1.15rem;">
+        Every doctoral scholar in this room makes a thousand small decisions a week about where to invite AI into their scholarship. The literature review you are drafting tonight. The committee feedback you have to address by Friday. The chapter you have rewritten six times. The question the framework asks of K-12 is the same question it asks of you:
+      </p>
+      <p class="body-text" style="margin-top: 1.5rem; font-family: var(--serif); font-style: italic; font-size: 1.4rem; color: var(--accent); max-width: 900px; line-height: 1.4;">
+        When you delegate the interpretive labor, what happens to the thinker who would otherwise have done it?
+      </p>
+    </div>
+  </section>
+
+  <!-- ─────── 13 · SECTION III DIVIDER ─────── -->
+  <section class="slide section-divider" data-section="Section III · The Response" data-time="44" data-notes="Pivot to the framework. Pedagogical friction is your name for the response. Say what it is not before you say what it is: not a ban, not nostalgia, not difficulty for difficulty's sake.">
+    <div class="atmosphere">
+      <div class="glow" style="background: var(--accent); width: 500px; height: 500px; bottom: 10%; right: 15%;"></div>
+    </div>
+    <div class="slide-inner content">
+      <div class="marker">iii</div>
+      <div class="eyebrow"><span class="num">12</span> Section iii · Response framework</div>
+      <h1 class="title">Pedagogical<br><em>Friction.</em></h1>
+      <div class="subtitle" style="margin-top: 2rem;">The intentional preservation of cognitive, rhetorical, existential, and infrastructural resistance under conditions where frictionless automation has become the default.</div>
+    </div>
+  </section>
+
+  <!-- ─────── 14 · FOUR DIMENSIONS (interactive explorer) ─────── -->
+  <section class="slide" data-section="Section III · The Response" data-time="47" data-notes="Click each dimension. Each one reveals how it applies to doctoral scholarship specifically. This is the bridge from theory to their lived work. Take questions as you go.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">13</span> Four dimensions · click to apply to doctoral work</div>
+      <h3 class="slide-title">The head, the room, the world, the system.</h3>
+      <div class="dimensions-grid" id="dim-grid">
+        <div class="dim-card active" data-dim="0">
+          <div class="roman">i</div>
+          <div>
+            <div class="dim-name">Noetic friction</div>
+            <div class="dim-locus">The head · internal cognitive resistance</div>
+            <div class="dim-summary">Comprehending difficult text, synthesizing sources, building argument from evidence, revising your own thinking.</div>
+            <div class="doctoral">
+              <div class="doctoral-label">In your scholarship</div>
+              <div class="doctoral-text">Reading the source yourself before asking the AI to summarize it. Writing your first interpretation of a passage before checking what the model would say. The schema you build by struggling with Foucault at 11pm is not transferable to the model that produced the polished paragraph.</div>
+            </div>
+          </div>
+        </div>
+        <div class="dim-card" data-dim="1">
+          <div class="roman">ii</div>
+          <div>
+            <div class="dim-name">Rhetorical friction</div>
+            <div class="dim-locus">The room · social and dialogic struggle</div>
+            <div class="dim-summary">Defending claims against another mind that disagrees, misunderstands, or pushes back in ways you cannot predict.</div>
+            <div class="doctoral">
+              <div class="doctoral-label">In your scholarship</div>
+              <div class="doctoral-text">Your committee meeting is rhetorical friction. So is the conference Q&amp;A when someone has read your paper closely. The AI will not push back the way a chair does. It will not ask the question that exposes the soft assumption in chapter three.</div>
+            </div>
+          </div>
+        </div>
+        <div class="dim-card" data-dim="2">
+          <div class="roman">iii</div>
+          <div>
+            <div class="dim-name">Existential friction</div>
+            <div class="dim-locus">The world · embodied accountability</div>
+            <div class="dim-summary">Presenting your own thinking, in your own voice, with your name attached.</div>
+            <div class="doctoral">
+              <div class="doctoral-label">In your scholarship</div>
+              <div class="doctoral-text">Your name on the dissertation. Your defense. The published article you will be asked about for the rest of your career. Existential friction is what makes scholarship a vocation rather than a deliverable.</div>
+            </div>
+          </div>
+        </div>
+        <div class="dim-card" data-dim="3">
+          <div class="roman">iv</div>
+          <div>
+            <div class="dim-name">Infrastructural friction</div>
+            <div class="dim-locus">The system · condition of possibility</div>
+            <div class="dim-summary">The institutional conditions, policy, time, professional norms, that make the other three sustainable.</div>
+            <div class="doctoral">
+              <div class="doctoral-label">In your scholarship</div>
+              <div class="doctoral-text">Your IRB, your journal's AI policy, your program's expectations, your chair's stance. The infrastructure decides whether you can practice the other three friction dimensions, or whether the institution quietly pushes you to bypass them.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 15 · PRODUCTIVE VS EXCLUSIONARY ─────── -->
+  <section class="slide" data-section="Section III · The Response" data-time="52" data-notes="The equity move. An argument for friction can become an argument for inequity if it does not ask whose learning a difficulty supports. Doctoral scholars who write in a second language, scholars with disabilities, scholars who are first-generation. The same AI tool can be productive friction reduction or unproductive bypass. Distinguishing them is judgment, not policy.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">14</span> The equity test</div>
+      <h3 class="slide-title">Not all friction is productive.</h3>
+      <p class="body-text" style="margin-bottom: 1rem;">An argument for preserving friction can become an argument for preserving inequity if it does not ask whose work a given difficulty supports.</p>
+      <div class="compare">
+        <div class="compare-col productive">
+          <h4>Productive friction · builds capacity</h4>
+          <ul>
+            <li>Wrestling with difficult theoretical text</li>
+            <li>Drafting your own argument before consulting models</li>
+            <li>Defending claims under genuine critique</li>
+            <li>Revising chapters based on substantive feedback</li>
+            <li>Struggle that prepares you for the next problem</li>
+          </ul>
+        </div>
+        <div class="compare-col exclusionary">
+          <h4>Exclusionary friction · blocks access</h4>
+          <ul>
+            <li>Language barriers imposed on content mastery</li>
+            <li>Inaccessible formats unrelated to scholarly work</li>
+            <li>Procedural hoops disconnected from learning</li>
+            <li>"Rigor" that gatekeeps without building schema</li>
+            <li>Difficulty treating one writing profile as the norm</li>
+          </ul>
+        </div>
+      </div>
+      <p class="body-text" style="font-size: 0.95rem; margin-top: 1.5rem; color: var(--ink-soft); font-style: italic;">The same tool can do both at the same time. Distinguishing them requires situated judgment.</p>
+    </div>
+  </section>
+
+  <!-- ─────── 16 · APPLY THE AUDIT (interactive scenario picker) ─────── -->
+  <section class="slide" data-section="Section III · The Response" data-time="55" data-notes="This is the application widget. Click a scenario. For each scenario, the audience can see how the friction audit applies. Use this to facilitate small-group discussion. Give the audience 12 minutes in groups, then bring them back. Each group reports out one productive use, one exclusionary risk, and the dimension they found hardest to adjudicate.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">15</span> Apply the framework · your scholarly work</div>
+      <h3 class="slide-title">Choose a scenario. Audit the friction.</h3>
+      <p class="body-text" style="margin-bottom: 0.5rem; font-size: 0.98rem;">Each scenario is something a doctoral scholar in this room is doing this week. Pick one. Discuss in groups of three.</p>
+      <div class="scenario-picker">
+        <div class="scenario-list">
+          <button class="scenario-btn active" data-scenario="0">
+            <span class="s-num">scenario 01</span>
+            Synthesizing 40 articles for a literature review
+          </button>
+          <button class="scenario-btn" data-scenario="1">
+            <span class="s-num">scenario 02</span>
+            Responding to substantive committee critique on chapter three
+          </button>
+          <button class="scenario-btn" data-scenario="2">
+            <span class="s-num">scenario 03</span>
+            Generating interview questions aligned to research questions
+          </button>
+          <button class="scenario-btn" data-scenario="3">
+            <span class="s-num">scenario 04</span>
+            Polishing prose written in a second academic language
+          </button>
+        </div>
+        <div class="scenario-display" id="scenario-display">
+          <div class="s-title">Synthesizing 40 articles for a literature review</div>
+          <div class="s-vignette">You have forty PDFs in Zotero. Your committee wants a synthesis chapter by month's end. The AI can produce a competent thematic synthesis in twenty minutes.</div>
+          <div class="s-section">
+            <div class="s-label">Where productive friction lives</div>
+            <div class="s-content productive">Reading the actual sources, marking what surprises you, writing your own synthesis of what these forty papers do and do not say. The schema you build here is the framework you will use to read the next forty.</div>
+          </div>
+          <div class="s-section">
+            <div class="s-label">Where exclusionary friction lives</div>
+            <div class="s-content exclusionary">Forty PDFs without retrieval-augmented search would be a procedural barrier unrelated to scholarly judgment. AI search and summary of long documents can be access scaffolding.</div>
+          </div>
+          <div class="s-section">
+            <div class="s-label">The hardest call</div>
+            <div class="s-content">The line between "I used AI to find the relevant passages" and "I used AI to do the thinking about what those passages mean." You may need to do both, but only the second one is your dissertation.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 17 · DISCUSSION PROMPTS ─────── -->
+  <section class="slide" data-section="Section III · The Response" data-time="59" data-notes="Three discussion prompts. Give groups twelve minutes. Then bring them back. Each group reports one specific friction dimension they had trouble preserving in their own work, and one institutional barrier (infrastructural friction) that makes it harder. You'll get the most valuable material of the session here.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">16</span> Group discussion · 12 minutes</div>
+      <h3 class="slide-title">Three questions for your group.</h3>
+      <div class="prompts">
+        <div class="prompt">
+          <div class="p-num">i</div>
+          <div class="p-text">Where in your own scholarship have you noticed AI offering to bypass exactly the cognitive work you most need to do?</div>
+        </div>
+        <div class="prompt">
+          <div class="p-num">ii</div>
+          <div class="p-text">Where has AI legitimately reduced an exclusionary barrier in your work, and how do you know it has not also reduced productive friction?</div>
+        </div>
+        <div class="prompt">
+          <div class="p-num">iii</div>
+          <div class="p-text">What infrastructural change at NLU would most strengthen the other three dimensions for doctoral scholars?</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────── 18 · SYNTHESIS ─────── -->
+  <section class="slide" data-section="Closing" data-time="68" data-notes="Bring it home. The educational problem is not academic integrity. It is the bypassing of interpretive labor, intellectual accountability, and the developmental conditions on which human learning depends. Including yours.">
+    <div class="atmosphere">
+      <div class="glow" style="background: var(--accent); width: 600px; height: 600px; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+    </div>
+    <div class="slide-inner lede-slide">
+      <div class="eyebrow"><span class="num">17</span> Closing synthesis</div>
+      <div class="lede-large" style="margin-bottom: 2.5rem;">
+        The educational problem posed by generative AI is the bypassing of <em>interpretive labor</em>, <em>intellectual accountability</em>, and the developmental conditions on which human learning depends.
+      </div>
+      <p class="body-text" style="font-size: 1.15rem; font-style: italic; font-family: var(--serif);">Including yours.</p>
+    </div>
+  </section>
+
+  <!-- ─────── 19 · TAKE-HOME ─────── -->
+  <section class="slide" data-section="Closing" data-time="70" data-notes="Q&A. Point them to the take-home artifact. Thank them.">
+    <div class="slide-inner">
+      <div class="eyebrow"><span class="num">18</span> Take this with you · questions welcome</div>
+      <h2 class="section-title">A friction audit for <em>your</em> scholarship.</h2>
+      <div class="two-col weighted" style="margin-top: 2.5rem;">
+        <div>
+          <p class="body-text" style="font-size: 1.05rem;">A one-page diagnostic instrument keyed to the four dimensions. Use it on a chapter you are drafting, an article you are revising, or a methodology you are designing. Ask the diagnostic question, choose one design move, complete the equity check.</p>
+          <p class="body-text" style="margin-top: 1.25rem; font-size: 1.05rem; color: var(--ink-soft);">The most useful version of this framework is the one you apply to your own work this week.</p>
+        </div>
+        <div style="border-left: 1px solid var(--rule-strong); padding-left: 2rem;">
+          <div class="eyebrow" style="margin-bottom: 1rem;">Companion artifacts</div>
+          <ul style="list-style: none; padding: 0; font-family: var(--mono); font-size: 0.85rem; color: var(--ink); line-height: 2;">
+            <li>→ friction-audit · printable handout</li>
+            <li>→ tertiary-algorithmicity.site</li>
+            <li>→ pedagogical-friction-companion</li>
+            <li>→ the-long-arc-of-machine-intelligence</li>
+          </ul>
+          <div class="byline" style="margin-top: 2.5rem;">
+            <strong>Micah J. Miner, CETL, Ed.S.</strong>
+            <span>National Louis University</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ─────── speaker notes ─────── -->
+<aside class="notes" id="notes">
+  <div class="notes-header">
+    <span class="label">Speaker notes</span>
+    <span>Press <kbd style="background:var(--bg);border:1px solid var(--ink-ghost);padding:0.1rem 0.3rem;border-radius:3px;color:var(--ink-soft);font-size:0.6rem;">N</kbd> to toggle</span>
+  </div>
+  <div class="notes-body" id="notes-body"></div>
+</aside>
+
+<!-- ─────── help overlay ─────── -->
+<div class="help" id="help">
+  <div class="help-content">
+    <h3>Keyboard controls</h3>
+    <div class="key-list">
+      <kbd>→ / Space</kbd><span class="desc">Next slide</span>
+      <kbd>←</kbd><span class="desc">Previous slide</span>
+      <kbd>N</kbd><span class="desc">Toggle speaker notes</span>
+      <kbd>T</kbd><span class="desc">Start / pause / reset timer</span>
+      <kbd>Primary deck</kbd><span class="desc">Open the linear presentation version</span>
+      <kbd>Home</kbd><span class="desc">Jump to first slide</span>
+      <kbd>End</kbd><span class="desc">Jump to last slide</span>
+      <kbd>F</kbd><span class="desc">Toggle fullscreen</span>
+      <kbd>? / Esc</kbd><span class="desc">Show / hide this help</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────── state ───────
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let current = 0;
+let notesVisible = false;
+let timerState = 'paused'; // paused, running
+let timerStart = null;
+let timerElapsed = 0;
+let timerInterval = null;
+
+// ─────── elements ───────
+const progress = document.getElementById('progress');
+const counter = document.getElementById('slide-counter');
+const chromeSection = document.getElementById('chrome-section');
+const notesEl = document.getElementById('notes');
+const notesBody = document.getElementById('notes-body');
+const helpEl = document.getElementById('help');
+const timerEl = document.getElementById('timer');
+
+// ─────── slide navigation ───────
+function showSlide(i) {
+  if (i < 0 || i >= total) return;
+  slides[current].classList.remove('active');
+  slides[current].classList.add('exiting');
+  setTimeout(() => slides[current].classList.remove('exiting'), 600);
+  current = i;
+  slides[current].classList.add('active');
+  updateChrome();
+}
+
+function updateChrome() {
+  const slide = slides[current];
+  const pct = ((current + 1) / total) * 100;
+  progress.style.width = pct + '%';
+  counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  chromeSection.textContent = 'Section · ' + (slide.dataset.section || '');
+  const notes = slide.dataset.notes || '';
+  notesBody.innerHTML = notes ? '<p>' + notes + '</p>' : '<p style="color:var(--ink-faint);font-style:italic;">No notes for this slide.</p>';
+}
+
+// ─────── timer ───────
+function fmtTime(ms) {
+  const total = Math.floor(ms / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function tickTimer() {
+  if (timerState !== 'running') return;
+  const now = Date.now();
+  const elapsed = timerElapsed + (now - timerStart);
+  timerEl.textContent = fmtTime(elapsed);
+  if (elapsed > 70 * 60 * 1000) timerEl.classList.add('over');
+}
+
+function toggleTimer() {
+  if (timerState === 'paused') {
+    timerStart = Date.now();
+    timerState = 'running';
+    timerInterval = setInterval(tickTimer, 500);
+  } else {
+    timerElapsed += Date.now() - timerStart;
+    timerState = 'paused';
+    clearInterval(timerInterval);
+  }
+}
+
+function resetTimer() {
+  timerState = 'paused';
+  timerElapsed = 0;
+  timerStart = null;
+  clearInterval(timerInterval);
+  timerEl.textContent = '00:00';
+  timerEl.classList.remove('over');
+}
+
+// ─────── notes ───────
+function toggleNotes() {
+  notesVisible = !notesVisible;
+  notesEl.classList.toggle('visible', notesVisible);
+}
+
+// ─────── help ───────
+function toggleHelp() {
+  helpEl.classList.toggle('visible');
+}
+
+// ─────── keyboard ───────
+document.addEventListener('keydown', (e) => {
+  // Don't capture if user is interacting with a button
+  if (e.target.tagName === 'BUTTON' && e.key === 'Enter') return;
+
+  switch (e.key) {
+    case 'ArrowRight':
+    case ' ':
+      e.preventDefault();
+      if (current < total - 1) showSlide(current + 1);
+      break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      if (current > 0) showSlide(current - 1);
+      break;
+    case 'Home':
+      e.preventDefault();
+      showSlide(0);
+      break;
+    case 'End':
+      e.preventDefault();
+      showSlide(total - 1);
+      break;
+    case 'n':
+    case 'N':
+      e.preventDefault();
+      toggleNotes();
+      break;
+    case 't':
+    case 'T':
+      e.preventDefault();
+      if (e.shiftKey) resetTimer();
+      else toggleTimer();
+      break;
+    case '?':
+    case '/':
+      e.preventDefault();
+      toggleHelp();
+      break;
+    case 'Escape':
+      helpEl.classList.remove('visible');
+      break;
+    case 'f':
+    case 'F':
+      e.preventDefault();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+      break;
+  }
+});
+
+// ─────── ong timeline interactivity ───────
+const timelineCells = document.querySelectorAll('#ong-timeline .stage-cell');
+const timelineDetail = document.getElementById('timeline-detail');
+
+const timelineContent = [
+  { name: 'Primary orality', body: 'Memory-based, communal, situational. Knowledge preserved through repetition, formula, and rhythm. The word lives only in the existential present. There is no text to consult, no record to revise. To know something is to be able to say it now, in the company of others.' },
+  { name: 'Literacy (and print)', body: 'Writing externalizes memory. Analytical detachment becomes possible. Individual interiority, abstract reasoning, the separation of the knower from the known. The dissertation is an artifact of this stage: a sustained written argument that can be revised, defended, and consulted by readers who were not present at its writing.' },
+  { name: 'Secondary orality', body: 'Broadcast media retrieve the immediacy and participation of oral cultures, but on a literate substructure of scripts, schedules, and institutions. Television and radio create a shared symbolic environment that everyone tunes into at the same time.' },
+  { name: 'Algorithmic secondary orality', body: 'Humans still create symbolic content, but algorithms determine what reaches which consciousness. Two scholars open the same platform and encounter different literatures. The editorial function shifts from human gatekeepers to computational systems optimized for engagement.' },
+  { name: 'Tertiary algorithmicity', body: 'Algorithmic systems now both curate and generate symbolic content. The new axis is no longer speech vs. writing. It is whether a human or an algorithm produced the content. Human authorship becomes optional at scale.' }
+];
+
+timelineCells.forEach((cell, i) => {
+  cell.addEventListener('click', () => {
+    timelineCells.forEach(c => c.classList.remove('active'));
+    cell.classList.add('active');
+    const c = timelineContent[i];
+    timelineDetail.innerHTML = '<div class="detail-name">' + c.name + '</div><div class="detail-body">' + c.body + '</div>';
+  });
+});
+
+// ─────── assumption cards ───────
+document.querySelectorAll('.assumption-card').forEach(card => {
+  card.addEventListener('click', () => {
+    card.classList.toggle('revealed');
+  });
+});
+
+// ─────── dimension cards ───────
+const dimCards = document.querySelectorAll('.dim-card');
+dimCards.forEach(card => {
+  card.addEventListener('click', () => {
+    dimCards.forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+  });
+});
+
+// ─────── scenario picker ───────
+const scenarios = [
+  {
+    title: 'Synthesizing 40 articles for a literature review',
+    vignette: 'You have forty PDFs in Zotero. Your committee wants a synthesis chapter by month\'s end. The AI can produce a competent thematic synthesis in twenty minutes.',
+    productive: 'Reading the actual sources, marking what surprises you, writing your own synthesis of what these forty papers do and do not say. The schema you build here is the framework you will use to read the next forty.',
+    exclusionary: 'Forty PDFs without retrieval-augmented search would be a procedural barrier unrelated to scholarly judgment. AI search and summary of long documents can be access scaffolding.',
+    hard: 'The line between "I used AI to find the relevant passages" and "I used AI to do the thinking about what those passages mean." You may need to do both, but only the second one is your dissertation.'
+  },
+  {
+    title: 'Responding to substantive committee critique on chapter three',
+    vignette: 'Your chair has returned chapter three with eight pages of comments challenging your theoretical framing. The AI can produce a revised version that addresses every comment overnight.',
+    productive: 'Sitting with the critique. Drafting your response in your own voice. Recognizing where your chair is right (and where they are not). The revision is the dissertation work. Outsourcing it means missing the formative moment of the doctoral process.',
+    exclusionary: 'A scholar managing a chronic illness, a full-time job, or caregiving responsibilities may legitimately need AI to organize the response into a manageable structure. Time-poverty is not the same as cognitive laziness.',
+    hard: 'When does "AI helped me see the structure of my chair\'s critique" become "AI wrote my response"? The boundary lives in whether you would still recognize and defend the revisions in your defense.'
+  },
+  {
+    title: 'Generating interview questions aligned to research questions',
+    vignette: 'You have three research questions for your case study. You need a semi-structured interview protocol with twelve questions. The AI can generate them in under a minute.',
+    productive: 'Drafting your own questions first. Noticing what the AI generates that you missed and what it generates that misses the point. The interview protocol is a theoretical instrument; it should reflect your conceptual framework, not generic qualitative research conventions.',
+    exclusionary: 'Doctoral scholars without methodological training in interview design (common in mixed-methods or applied programs) may legitimately use AI to suggest probing follow-ups or to surface methodological norms they have not been taught.',
+    hard: 'The model produces fluent questions that sound like good qualitative research and may not align with your specific theoretical commitments. The danger is that the questions look right enough that you don\'t notice they do not match your framework.'
+  },
+  {
+    title: 'Polishing prose written in a second academic language',
+    vignette: 'You are a doctoral scholar writing your dissertation in English, which is not your first language. The AI can produce a version of your draft that reads as if written by a native academic English speaker.',
+    productive: 'Writing your own draft first. Using AI to surface unidiomatic constructions, to learn from the patterns of revision, to develop your own English-academic voice over time. The labor of writing in a second language is part of how scholars learn to argue in that language.',
+    exclusionary: 'Academic English is a gatekeeping mechanism. Demanding that multilingual scholars produce native-fluent prose without scaffolding is a real barrier unrelated to scholarly capacity. AI translation and polishing can be access work, not bypass.',
+    hard: 'The boundary lives in voice. When the AI smooths your prose to the point that the distinctive way you think in your first language disappears, the access work has become assimilation. Your voice is not a barrier; it is part of the contribution.'
+  }
+];
+
+const scenarioBtns = document.querySelectorAll('.scenario-btn');
+const scenarioDisplay = document.getElementById('scenario-display');
+
+scenarioBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const i = parseInt(btn.dataset.scenario);
+    scenarioBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const s = scenarios[i];
+    scenarioDisplay.innerHTML = `
+      <div class="s-title">${s.title}</div>
+      <div class="s-vignette">${s.vignette}</div>
+      <div class="s-section">
+        <div class="s-label">Where productive friction lives</div>
+        <div class="s-content productive">${s.productive}</div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Where exclusionary friction lives</div>
+        <div class="s-content exclusionary">${s.exclusionary}</div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">The hardest call</div>
+        <div class="s-content">${s.hard}</div>
+      </div>
+    `;
+  });
+});
+
+// ─────── init ───────
+updateChrome();
+</script>
+
+</body>
+</html>

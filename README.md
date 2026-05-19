@@ -9,6 +9,7 @@ This deck reframes the prior qualifying-paper presentation into a 70-minute, lea
 ## Files
 
 - `index.html` is the browser-based slide deck.
+- `workshop-version/index.html` is the secondary interactive workshop version with a timer, speaker-note drawer, clickable framework elements, and friction-audit scenarios.
 - `.nojekyll` keeps GitHub Pages from processing the static site.
 - `.gitignore` excludes local preview and operating-system artifacts.
 
@@ -24,6 +25,8 @@ Keyboard controls:
 - End: final slide.
 
 Speaker notes are included in hidden `<aside class="speaker-notes">` blocks inside the HTML source. They are intentionally not visible to the audience-facing deck.
+
+The primary deck links to the workshop version, and the workshop version links back to the primary deck so either can be assigned or used live.
 
 ## GitHub Pages setup
 

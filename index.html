@@ -528,6 +528,31 @@
       transition: opacity 160ms ease;
     }
 
+    .deck-switch {
+      position: fixed;
+      left: 50%;
+      top: 24px;
+      transform: translateX(-50%);
+      z-index: 12;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 253, 248, 0.24);
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: rgba(24, 21, 18, 0.78);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 13px;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .deck-switch:focus-visible {
+      outline: 3px solid var(--ember-2);
+      outline-offset: 4px;
+    }
+
     .controls:hover,
     .controls:focus-within {
       opacity: 1;
@@ -609,6 +634,12 @@
         transform: none;
         flex-direction: row;
       }
+
+      .deck-switch {
+        top: 10px;
+        font-size: 11px;
+        padding: 8px 11px;
+      }
     }
 
     @media print {
@@ -636,10 +667,15 @@
       .controls {
         display: none;
       }
+
+      .deck-switch {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
+  <a class="deck-switch" href="workshop-version/" aria-label="Open the interactive workshop version">Workshop version</a>
   <main class="deck" aria-live="polite">
     <section class="slide active dark compact" data-title="AI, Learning, and Productive Struggle">
       <div class="meta"><span><i class="dot"></i>National Louis University - Doctoral Colloquium</span><span>01 / 22</span></div>
