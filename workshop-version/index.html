@@ -1135,6 +1135,145 @@ h3.slide-title {
   outline: none;
 }
 
+/* ─────── facilitator link layer ─────── */
+
+.tools-toggle {
+  position: fixed;
+  right: 2rem;
+  top: 4.1rem;
+  z-index: 120;
+  pointer-events: auto;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  padding: 0.55rem 0.82rem;
+  background: rgba(10, 10, 11, 0.84);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tools-toggle:hover,
+.tools-toggle:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
+.workshop-tools {
+  position: fixed;
+  right: 2rem;
+  top: 7rem;
+  z-index: 119;
+  width: min(360px, calc(100vw - 2rem));
+  max-height: calc(100vh - 9rem);
+  overflow-y: auto;
+  border: 1px solid var(--rule-strong);
+  background: rgba(20, 20, 22, 0.94);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+  padding: 1rem;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.workshop-tools.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.tool-group + .tool-group {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+.tool-heading {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.55rem;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.tool-link,
+.tool-button,
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2.35rem;
+  border: 1px solid var(--rule);
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  line-height: 1.15;
+  padding: 0.58rem 0.68rem;
+  cursor: pointer;
+}
+
+.tool-link:hover,
+.tool-button:hover,
+.copy-btn:hover,
+.tool-link:focus-visible,
+.tool-button:focus-visible,
+.copy-btn:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+
+.tool-link span,
+.tool-button span {
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tool-note {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin-top: 0.55rem;
+}
+
+.prompt {
+  position: relative;
+}
+
+.copy-btn {
+  margin-top: 1rem;
+  min-height: auto;
+  width: fit-content;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.copy-btn.copied {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* ─────── responsive ─────── */
 
 @media (max-width: 900px) {
@@ -1149,12 +1288,38 @@ h3.slide-title {
   .quadrants .row-head { writing-mode: horizontal-tb; transform: none; border-right: none; border-bottom: 1px solid var(--rule); }
   .timeline { grid-template-columns: 1fr 1fr; }
   .deck-switch { top: 0.6rem; font-size: 0.6rem; padding: 0.5rem 0.7rem; }
+  .tools-toggle { right: 1rem; top: 3.8rem; }
+  .workshop-tools { right: 1rem; top: 6.5rem; }
+  .tool-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
 <a class="deck-switch" href="../" aria-label="Open the primary linear presentation deck">Primary deck</a>
+<button class="tools-toggle" id="tools-toggle" type="button" aria-expanded="false" aria-controls="workshop-tools">Workshop links</button>
+
+<nav class="workshop-tools" id="workshop-tools" aria-label="Workshop links and quick jumps">
+  <div class="tool-group">
+    <div class="tool-heading">Jump to</div>
+    <div class="tool-grid">
+      <button class="tool-button" type="button" data-jump="1">Case <span>02</span></button>
+      <button class="tool-button" type="button" data-jump="4">Theory <span>05</span></button>
+      <button class="tool-button" type="button" data-jump="9">Stakes <span>10</span></button>
+      <button class="tool-button" type="button" data-jump="12">Friction <span>13</span></button>
+      <button class="tool-button" type="button" data-jump="14">Audit <span>15</span></button>
+      <button class="tool-button" type="button" data-jump="15">Discussion <span>16</span></button>
+    </div>
+  </div>
+  <div class="tool-group">
+    <div class="tool-heading">Related pages</div>
+    <a class="tool-link" href="../" target="_blank" rel="noopener">Primary deck <span>open</span></a>
+    <a class="tool-link" href="https://minerclass.github.io/dissertationquestionsbeta/dissertation-sites/" target="_blank" rel="noopener">Dissertation research hub <span>open</span></a>
+    <a class="tool-link" href="https://minerclass.github.io/qualifying-dissertation-resource-site/" target="_blank" rel="noopener">Qualifying paper resource hub <span>open</span></a>
+    <a class="tool-link" href="https://minerclass.github.io/nlu_ai-ed-conference-pres26/aaacs-frictionless-citizen/" target="_blank" rel="noopener">Frictionless Citizen option <span>open</span></a>
+    <p class="tool-note">Use these as assignment links, follow-up resources, or alternate presentation paths.</p>
+  </div>
+</nav>
 
 <div class="progress-bar" id="progress"></div>
 
@@ -1602,14 +1767,17 @@ h3.slide-title {
         <div class="prompt">
           <div class="p-num">i</div>
           <div class="p-text">Where in your own scholarship have you noticed AI offering to bypass exactly the cognitive work you most need to do?</div>
+          <button class="copy-btn" type="button" data-copy="Where in your own scholarship have you noticed AI offering to bypass exactly the cognitive work you most need to do?">Copy prompt</button>
         </div>
         <div class="prompt">
           <div class="p-num">ii</div>
           <div class="p-text">Where has AI legitimately reduced an exclusionary barrier in your work, and how do you know it has not also reduced productive friction?</div>
+          <button class="copy-btn" type="button" data-copy="Where has AI legitimately reduced an exclusionary barrier in your work, and how do you know it has not also reduced productive friction?">Copy prompt</button>
         </div>
         <div class="prompt">
           <div class="p-num">iii</div>
           <div class="p-text">What infrastructural change at NLU would most strengthen the other three dimensions for doctoral scholars?</div>
+          <button class="copy-btn" type="button" data-copy="What infrastructural change at NLU would most strengthen the other three dimensions for doctoral scholars?">Copy prompt</button>
         </div>
       </div>
     </div>
@@ -1676,6 +1844,7 @@ h3.slide-title {
       <kbd>←</kbd><span class="desc">Previous slide</span>
       <kbd>N</kbd><span class="desc">Toggle speaker notes</span>
       <kbd>T</kbd><span class="desc">Start / pause / reset timer</span>
+      <kbd>L</kbd><span class="desc">Toggle workshop links</span>
       <kbd>Primary deck</kbd><span class="desc">Open the linear presentation version</span>
       <kbd>Home</kbd><span class="desc">Jump to first slide</span>
       <kbd>End</kbd><span class="desc">Jump to last slide</span>
@@ -1704,6 +1873,8 @@ const notesEl = document.getElementById('notes');
 const notesBody = document.getElementById('notes-body');
 const helpEl = document.getElementById('help');
 const timerEl = document.getElementById('timer');
+const toolsToggle = document.getElementById('tools-toggle');
+const toolsPanel = document.getElementById('workshop-tools');
 
 // ─────── slide navigation ───────
 function showSlide(i) {
@@ -1714,6 +1885,12 @@ function showSlide(i) {
   current = i;
   slides[current].classList.add('active');
   updateChrome();
+}
+
+function toggleTools(force) {
+  const nextState = typeof force === 'boolean' ? force : !toolsPanel.classList.contains('visible');
+  toolsPanel.classList.toggle('visible', nextState);
+  toolsToggle.setAttribute('aria-expanded', String(nextState));
 }
 
 function updateChrome() {
@@ -1774,6 +1951,33 @@ function toggleHelp() {
   helpEl.classList.toggle('visible');
 }
 
+toolsToggle.addEventListener('click', () => toggleTools());
+
+document.querySelectorAll('[data-jump]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    showSlide(parseInt(btn.dataset.jump, 10));
+    toggleTools(false);
+  });
+});
+
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const text = btn.dataset.copy || '';
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy prompt';
+        btn.classList.remove('copied');
+      }, 1800);
+    } catch {
+      btn.textContent = 'Select text';
+      setTimeout(() => { btn.textContent = 'Copy prompt'; }, 1800);
+    }
+  });
+});
+
 // ─────── keyboard ───────
 document.addEventListener('keydown', (e) => {
   // Don't capture if user is interacting with a button
@@ -1808,6 +2012,11 @@ document.addEventListener('keydown', (e) => {
       if (e.shiftKey) resetTimer();
       else toggleTimer();
       break;
+    case 'l':
+    case 'L':
+      e.preventDefault();
+      toggleTools();
+      break;
     case '?':
     case '/':
       e.preventDefault();
@@ -1815,6 +2024,7 @@ document.addEventListener('keydown', (e) => {
       break;
     case 'Escape':
       helpEl.classList.remove('visible');
+      toggleTools(false);
       break;
     case 'f':
     case 'F':
