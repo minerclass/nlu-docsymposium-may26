@@ -23,10 +23,11 @@ Keyboard controls:
 - Left arrow or Page Up: previous slide.
 - Home: first slide.
 - End: final slide.
+- L: open the deck links and section-jump panel.
 
 Speaker notes are included in hidden `<aside class="speaker-notes">` blocks inside the HTML source. They are intentionally not visible to the audience-facing deck.
 
-The primary deck links to the workshop version, and the workshop version links back to the primary deck so either can be assigned or used live.
+The primary deck includes a restrained deck links panel, section jumps, an interactive AI use decision tool, and copyable discussion prompts. It links to the workshop version, and the workshop version links back to the primary deck so either can be assigned or used live.
 
 ## GitHub Pages setup
 

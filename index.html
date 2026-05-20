@@ -553,6 +553,150 @@
       outline-offset: 4px;
     }
 
+    .tools-toggle {
+      position: fixed;
+      left: calc(50% - 300px);
+      top: 24px;
+      z-index: 14;
+      border: 1px solid rgba(255, 253, 248, 0.28);
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: rgba(24, 21, 18, 0.84);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 13px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .tools-panel {
+      position: fixed;
+      left: calc(50% - 390px);
+      top: 72px;
+      z-index: 13;
+      width: min(390px, calc(100vw - 84px));
+      padding: 18px;
+      border: 1px solid rgba(255, 253, 248, 0.22);
+      border-radius: 8px;
+      background: rgba(24, 21, 18, 0.94);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+      color: var(--paper);
+      font-family: var(--sans);
+    }
+
+    .tools-panel[hidden] {
+      display: none;
+    }
+
+    .tools-panel h2 {
+      margin: 0 0 12px;
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: var(--ember-2);
+    }
+
+    .tool-grid,
+    .link-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tool-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 16px;
+    }
+
+    .jump-btn,
+    .tools-panel a,
+    .copy-btn,
+    .decision-btn {
+      min-height: 42px;
+      border: 1px solid rgba(255, 253, 248, 0.22);
+      border-radius: 8px;
+      background: rgba(255, 253, 248, 0.08);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .jump-btn,
+    .tools-panel a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .jump-btn:hover,
+    .tools-panel a:hover,
+    .copy-btn:hover,
+    .decision-btn:hover,
+    .tools-toggle:hover {
+      border-color: var(--ember-2);
+    }
+
+    .tools-toggle:focus-visible,
+    .jump-btn:focus-visible,
+    .tools-panel a:focus-visible,
+    .copy-btn:focus-visible,
+    .decision-btn:focus-visible {
+      outline: 3px solid var(--ember-2);
+      outline-offset: 3px;
+    }
+
+    .decision-tool {
+      display: grid;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .decision-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .decision-btn {
+      padding: 12px 14px;
+      background: var(--dark);
+      color: var(--paper);
+      text-align: left;
+    }
+
+    .decision-btn[aria-pressed="true"] {
+      border-color: var(--ember);
+      background: rgba(178, 90, 50, 0.16);
+    }
+
+    .decision-output {
+      min-height: 72px;
+      padding: 15px 18px;
+      border-left: 8px solid var(--ember);
+      background: rgba(178, 90, 50, 0.08);
+      color: var(--ink);
+      font-size: clamp(20px, 1.8vw, 27px);
+      line-height: 1.2;
+    }
+
+    .copy-btn {
+      align-self: center;
+      padding: 9px 12px;
+      background: var(--dark);
+      color: var(--paper);
+      white-space: nowrap;
+    }
+
+    .note-item.with-copy {
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+    }
+
     .controls:hover,
     .controls:focus-within {
       opacity: 1;
@@ -640,6 +784,33 @@
         font-size: 11px;
         padding: 8px 11px;
       }
+
+      .tools-toggle {
+        left: 12px;
+        top: 10px;
+        font-size: 11px;
+        padding: 8px 11px;
+      }
+
+      .tools-panel {
+        left: 12px;
+        top: 54px;
+        width: min(360px, calc(100vw - 24px));
+      }
+
+      .decision-buttons,
+      .tool-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .note-item.with-copy {
+        grid-template-columns: auto 1fr;
+      }
+
+      .note-item.with-copy .copy-btn {
+        grid-column: 2;
+        justify-self: start;
+      }
     }
 
     @media print {
@@ -668,7 +839,10 @@
         display: none;
       }
 
-      .deck-switch {
+      .deck-switch,
+      .tools-toggle,
+      .tools-panel,
+      .copy-btn {
         display: none;
       }
     }
@@ -676,6 +850,25 @@
 </head>
 <body>
   <a class="deck-switch" href="workshop-version/" aria-label="Open the interactive workshop version">Workshop version</a>
+  <button class="tools-toggle" id="tools-toggle" type="button" aria-expanded="false" aria-controls="deck-tools">Deck links</button>
+  <aside class="tools-panel" id="deck-tools" aria-label="Deck links and slide jumps" hidden>
+    <h2>Jump to section</h2>
+    <div class="tool-grid">
+      <button class="jump-btn" type="button" data-jump="2">Opening case</button>
+      <button class="jump-btn" type="button" data-jump="6">Theory</button>
+      <button class="jump-btn" type="button" data-jump="10">Effects</button>
+      <button class="jump-btn" type="button" data-jump="14">Friction</button>
+      <button class="jump-btn" type="button" data-jump="17">Decision tool</button>
+      <button class="jump-btn" type="button" data-jump="22">Discussion</button>
+    </div>
+    <h2>Related pages</h2>
+    <div class="link-grid">
+      <a href="workshop-version/">Workshop version</a>
+      <a href="https://minerclass.github.io/dissertationquestionsbeta/dissertation-sites/">Dissertation research hub</a>
+      <a href="https://minerclass.github.io/qualifying-dissertation-resource-site/">Qualifying resource hub</a>
+      <a href="https://minerclass.github.io/nlu_ai-ed-conference-pres26/frictionless-citizen/">Frictionless Citizen option</a>
+    </div>
+  </aside>
   <main class="deck" aria-live="polite">
     <section class="slide active dark compact" data-title="AI, Learning, and Productive Struggle">
       <div class="meta"><span><i class="dot"></i>National Louis University - Doctoral Colloquium</span><span>01 / 22</span></div>
@@ -945,6 +1138,14 @@
             <ul><li>The tool performs the target thinking.</li><li>The process becomes invisible.</li><li>The student cannot explain or defend the work.</li></ul>
           </div>
         </div>
+        <div class="decision-tool" aria-label="Interactive AI use decision questions">
+          <div class="decision-buttons">
+            <button class="decision-btn" type="button" data-decision="barrier" aria-pressed="false">1. What barrier is being reduced?</button>
+            <button class="decision-btn" type="button" data-decision="thinking" aria-pressed="false">2. What thinking must stay human?</button>
+            <button class="decision-btn" type="button" data-decision="evidence" aria-pressed="false">3. What evidence will show learning?</button>
+          </div>
+          <div class="decision-output" id="decision-output" aria-live="polite">Start with the learning objective. Then decide whether AI removes an access barrier or bypasses the thinking the assignment was meant to develop.</div>
+        </div>
       </div>
       <div class="footer"><span>Reduce barriers, protect thinking</span><span>17 / 22</span></div>
       <aside class="speaker-notes">
@@ -1019,9 +1220,9 @@
       <div class="content">
         <h1>Discussion</h1>
         <div class="note-list">
-          <div class="note-item"><span class="num">1</span><span>Where have you seen AI deepen learning rather than bypass it?</span></div>
-          <div class="note-item"><span class="num">2</span><span>Which forms of friction are hardest to protect in your context?</span></div>
-          <div class="note-item"><span class="num">3</span><span>What would policy look like if learning, not only integrity, were the center?</span></div>
+          <div class="note-item with-copy"><span class="num">1</span><span>Where have you seen AI deepen learning rather than bypass it?</span><button class="copy-btn" type="button" data-copy="Where have you seen AI deepen learning rather than bypass it?">Copy</button></div>
+          <div class="note-item with-copy"><span class="num">2</span><span>Which forms of friction are hardest to protect in your context?</span><button class="copy-btn" type="button" data-copy="Which forms of friction are hardest to protect in your context?">Copy</button></div>
+          <div class="note-item with-copy"><span class="num">3</span><span>What would policy look like if learning, not only integrity, were the center?</span><button class="copy-btn" type="button" data-copy="What would policy look like if learning, not only integrity, were the center?">Copy</button></div>
         </div>
       </div>
       <div class="footer"><span>Thank you - questions welcome</span><span>22 / 22</span></div>
@@ -1037,14 +1238,23 @@
     <button type="button" id="next" aria-label="Next slide">Next</button>
   </nav>
 
-  <p class="sr-only" id="instructions">Use the right arrow, Page Down, or Space to move forward. Use the left arrow or Page Up to move backward. Use Home and End to jump to the first or final slide.</p>
+  <p class="sr-only" id="instructions">Use the right arrow, Page Down, or Space to move forward. Use the left arrow or Page Up to move backward. Use Home and End to jump to the first or final slide. Press L to open deck links.</p>
 
   <script>
     const slides = Array.from(document.querySelectorAll(".slide"));
     const counter = document.getElementById("counter");
     const previousButton = document.getElementById("prev");
     const nextButton = document.getElementById("next");
+    const toolsToggle = document.getElementById("tools-toggle");
+    const toolsPanel = document.getElementById("deck-tools");
+    const decisionOutput = document.getElementById("decision-output");
     let current = 0;
+
+    const decisionText = {
+      barrier: "Good AI support removes barriers that are not the learning goal: access, language support, planning, formatting, or first-step help.",
+      thinking: "Protect the target thinking: generating ideas, explaining reasoning, revising claims, connecting evidence, and making meaning.",
+      evidence: "Look for process evidence: notes, drafts, critique, oral defense, reflection, revision history, or transfer to a new task."
+    };
 
     function slideIndexFromHash() {
       const value = Number.parseInt(window.location.hash.replace("#", ""), 10);
@@ -1073,10 +1283,61 @@
       updateSlide(current + delta);
     }
 
+    function setToolsPanel(open) {
+      toolsPanel.hidden = !open;
+      toolsToggle.setAttribute("aria-expanded", String(open));
+    }
+
     previousButton.addEventListener("click", () => go(-1));
     nextButton.addEventListener("click", () => go(1));
+    toolsToggle.addEventListener("click", () => {
+      setToolsPanel(toolsPanel.hidden);
+    });
+
+    document.querySelectorAll("[data-jump]").forEach((button) => {
+      button.addEventListener("click", () => {
+        updateSlide(Number(button.dataset.jump) - 1);
+        setToolsPanel(false);
+      });
+    });
+
+    document.querySelectorAll("[data-decision]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-decision]").forEach((item) => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+        decisionOutput.textContent = decisionText[button.dataset.decision];
+      });
+    });
+
+    document.querySelectorAll("[data-copy]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const original = button.textContent;
+        try {
+          await navigator.clipboard.writeText(button.dataset.copy);
+          button.textContent = "Copied";
+        } catch (error) {
+          button.textContent = "Select text";
+        }
+        window.setTimeout(() => {
+          button.textContent = original;
+        }, 1600);
+      });
+    });
 
     document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setToolsPanel(false);
+        return;
+      }
+      if (event.key.toLowerCase() === "l" && !event.target.closest("input, textarea, select")) {
+        event.preventDefault();
+        setToolsPanel(toolsPanel.hidden);
+        return;
+      }
+      if (event.target.closest("button, a, input, textarea, select")) {
+        return;
+      }
       const forwardKeys = ["ArrowRight", "PageDown", " "];
       const backKeys = ["ArrowLeft", "PageUp"];
       if (forwardKeys.includes(event.key)) {
