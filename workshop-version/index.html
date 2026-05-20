@@ -139,6 +139,14 @@ html, body {
   display: flex;
   gap: 0.6rem;
   align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
 }
 
 .nav-hint kbd {
@@ -150,6 +158,18 @@ html, body {
   font-size: 0.62rem;
   color: var(--ink-soft);
   background: var(--bg-elevated);
+}
+
+.nav-hint:hover,
+.nav-hint:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.nav-hint:hover kbd,
+.nav-hint:focus-visible kbd {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .timer {
@@ -1330,7 +1350,7 @@ h3.slide-title {
 <div class="chrome bottom-left">Interactive Workshop Version · NLU Doctoral Colloquium · Miner</div>
 <div class="chrome bottom-right">
   <span class="timer" id="timer">00:00</span>
-  <span class="nav-hint"><kbd>?</kbd> help</span>
+  <button class="nav-hint" id="help-toggle" type="button" aria-expanded="false" aria-controls="help"><kbd>?</kbd> help</button>
 </div>
 
 <div class="stage" id="stage">
@@ -1875,6 +1895,7 @@ const helpEl = document.getElementById('help');
 const timerEl = document.getElementById('timer');
 const toolsToggle = document.getElementById('tools-toggle');
 const toolsPanel = document.getElementById('workshop-tools');
+const helpToggle = document.getElementById('help-toggle');
 
 // ─────── slide navigation ───────
 function showSlide(i) {
@@ -1949,8 +1970,10 @@ function toggleNotes() {
 // ─────── help ───────
 function toggleHelp() {
   helpEl.classList.toggle('visible');
+  helpToggle.setAttribute('aria-expanded', String(helpEl.classList.contains('visible')));
 }
 
+helpToggle.addEventListener('click', toggleHelp);
 toolsToggle.addEventListener('click', () => toggleTools());
 
 document.querySelectorAll('[data-jump]').forEach(btn => {
@@ -2024,6 +2047,7 @@ document.addEventListener('keydown', (e) => {
       break;
     case 'Escape':
       helpEl.classList.remove('visible');
+      helpToggle.setAttribute('aria-expanded', 'false');
       toggleTools(false);
       break;
     case 'f':
